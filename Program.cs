@@ -2,6 +2,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Reservations.Api.Data;
 using Reservations.Api.Services;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +21,9 @@ builder.Services.AddScoped<IReservationService, ReservationService>();
 // CORS
 builder.Services.AddCors(o => o.AddPolicy("AllowAll", p => p.AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin()));
 
+builder.Services.AddControllers()
+    .AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+
 var app = builder.Build();
 
 // Ensure DB
@@ -29,10 +33,11 @@ using (var scope = app.Services.CreateScope())
     db.Database.Migrate();
 }
 
+
 // Middleware
 //if (app.Environment.IsDevelopment())
 //{
-    app.UseSwagger();
+app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Reservations API V1");
